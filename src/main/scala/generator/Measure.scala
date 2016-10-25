@@ -27,6 +27,15 @@ case class Measure(
 
   def toJsonWithMissingKey =
     s"""{ "device_id": "$deviceId", "metric_value": $metricValue, "timestamp": $timestamp }"""
+
+  def toSomeJson = {
+    scala.util.Random.nextInt(15) match {
+      case 1 => toBrokenJson
+      case 2 => toJsonWithMissingKey
+      case _ => toValidJson
+    }
+    // FIXME - Configure prob
+  }
 }
 
 object Measure extends MeasureGenerators {
