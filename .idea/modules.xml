@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/sample_metric_generator.iml" filepath="$PROJECT_DIR$/.idea/modules/sample_metric_generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sample_metric_generator-build.iml" filepath="$PROJECT_DIR$/.idea/modules/sample_metric_generator-build.iml" />
     </modules>
   </component>
 </project>
