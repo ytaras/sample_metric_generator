@@ -41,12 +41,6 @@ object Measure extends MeasureGenerators {
     }
   }
 
-  def main(args: Array[String]) = {
-    (0 to 100).foreach { _ =>
-      println(sample(UUID.randomUUID()).toJsonWithMissingKey)
-    }
-  }
-
 }
 
 trait MeasureGenerators {

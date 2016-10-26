@@ -4,10 +4,16 @@ import java.util.UUID
 
 import akka.NotUsed
 import akka.actor.{ActorSystem, Cancellable}
+import akka.kafka.ProducerSettings
+import akka.kafka.scaladsl.Producer
+import akka.serialization.{NullSerializer, ByteArraySerializer}
 import akka.stream._
 import akka.stream.scaladsl._
 import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler}
 import com.typesafe.config.ConfigFactory
+import kamon.Kamon
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.serialization.StringSerializer
 import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 
@@ -16,32 +22,46 @@ import scala.concurrent.duration._
   */
 object Stream extends StreamUtils {
   import StreamSyntax._
-  private val sampleIds = (0 to 5).map(_ => UUID.randomUUID())
+  private val sampleIds = (0 to 500).map(_ => UUID.randomUUID())
 
-  def initialLoadDeviceIds: Source[UUID, NotUsed] = Source(sampleIds)
+  val initialLoadDeviceIds: Source[UUID, NotUsed] = Source(sampleIds).named("starting_device_ids")
 
-  def collectDeviceIds: Flow[UUID, Set[UUID], NotUsed] =
+  val collectDeviceIds: Flow[UUID, Set[UUID], NotUsed] =
     Flow[UUID]
       .map(x => Set(x))
       .reduce( _ ++_ )
 
-  def tick: Source[Unit, Cancellable] = Source.tick(0.second, 500.millis, ())
+  val tick: Source[Unit, Cancellable] = Source.tick(0.second, 250.millis, ())
+
+  def generateMeasures(distruptor: Measure => String): Flow[Set[UUID], String, NotUsed] =
+    Flow[Set[UUID]]
+      .named("generate_metrics")
+      .mapConcat(_.map(Measure.sample))
+      .map(distruptor)
 
   def main(args: Array[String]): Unit = {
+    Kamon.start()
+    val measuresCounter = Kamon.metrics.counter("measures-counter")
     val config = ConfigFactory.load()
-    val distruptor = MessageDistruptor(config)
+    val disruptor = MessageDisruptor(config)
+    val outputTo = config.getString("generator.topic.measures")
     implicit val as = ActorSystem()
     implicit val am = ActorMaterializer()
+    val producerSettings: ProducerSettings[String, String] =
+      ProducerSettings(system = as,
+        keySerializer = new StringSerializer(),
+        valueSerializer = new StringSerializer)
       initialLoadDeviceIds.via(collectDeviceIds)
         .wontFinish
         .holdWithWait
         .zip(tick)
         .map(_._1)
-        .mapConcat(_.map(Measure.sample))
-        .map(distruptor)
-        .runForeach(println)
-    Thread.sleep(5000)
-    as.terminate()
+        .via(generateMeasures(disruptor))
+        .map(elem => new ProducerRecord[String, String](outputTo, elem))
+        .alsoTo(
+          Sink.foreach(_ => measuresCounter.increment())
+        )
+        .runWith(Producer.plainSink(producerSettings).named("kafka-writer"))
   }
 
 }

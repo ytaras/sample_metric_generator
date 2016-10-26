@@ -43,5 +43,19 @@
     <orderEntry type="library" scope="TEST" name="SBT: org.specs2:specs2-matcher_2.11:3.8.5:jar" level="project" />
     <orderEntry type="library" name="SBT: org.scala-sbt:test-interface:1.0:jar" level="project" />
     <orderEntry type="library" name="SBT: org.scalacheck:scalacheck_2.11:1.13.3:jar" level="project" />
+    <orderEntry type="library" name="SBT: com.typesafe.akka:akka-stream-kafka_2.11:0.11-RC1:jar" level="project" />
+    <orderEntry type="library" name="SBT: net.jpountz.lz4:lz4:1.3.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.apache.kafka:kafka-clients:0.10.0.1:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.slf4j:slf4j-api:1.7.21:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.xerial.snappy:snappy-java:1.1.2.6:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:kamon-core_2.11:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.hdrhistogram:HdrHistogram:2.1.7:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:kamon-jmx_2.11:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:kamon-log-reporter_2.11:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:kamon-akka_2.11:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:kamon-scala_2.11:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:kamon-system-metrics_2.11:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:sigar-loader:1.6.5-rev002:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.aspectj:aspectjrt:1.8.2:jar" level="project" />
   </component>
 </module>

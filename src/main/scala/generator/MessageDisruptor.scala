@@ -7,7 +7,7 @@ import scala.util.Random
 /**
   * Created by ytaras on 10/26/16.
   */
-object MessageDistruptor {
+object MessageDisruptor {
   def apply(config: Config): (Measure => String) = {
     breakJson(config.getDouble("generator.probabilities.broken_json")) orElse
       removeKey(config.getDouble("generator.probabilities.missing_key")) orElse
