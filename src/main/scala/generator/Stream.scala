@@ -29,6 +29,7 @@ object Stream extends StreamUtils {
 
   def main(args: Array[String]): Unit = {
     val config = ConfigFactory.load()
+    val distruptor = MessageDistruptor(config)
     implicit val as = ActorSystem()
     implicit val am = ActorMaterializer()
       initialLoadDeviceIds.via(collectDeviceIds)
@@ -37,7 +38,7 @@ object Stream extends StreamUtils {
         .zip(tick)
         .map(_._1)
         .mapConcat(_.map(Measure.sample))
-        .map(_.toSomeJson)
+        .map(distruptor)
         .runForeach(println)
     Thread.sleep(5000)
     as.terminate()
