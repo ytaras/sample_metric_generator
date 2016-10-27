@@ -9,6 +9,7 @@ libraryDependencies ++= {
   Seq(
     "com.typesafe.akka" %% "akka-stream" % akkaVersion,
     "com.typesafe.akka" %% "akka-stream-kafka" % "0.11-RC1",
+    "org.slf4j" % "slf4j-simple" % "1.7.21",
     "org.scalacheck" %% "scalacheck" % "1.13.3",
     "io.kamon" %% "kamon-core" % "0.6.0",
     "io.kamon" %% "kamon-jmx" % "0.6.0",

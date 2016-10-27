@@ -32,12 +32,21 @@ case class Measure(
 
 object Measure extends MeasureGenerators {
 
+  def sample(deviceId: UUID): Measure =
+    generateSample(validMeasureGenerator(deviceId))
+
   @tailrec
-  def sample(deviceId: UUID): Measure = {
-    validMeasureGenerator(deviceId).sample
-    match {
-      case Some(m) => m
-      case None => sample(deviceId)
+  def generateSample[T](g: Gen[T]): T = {
+    g.sample match {
+      case None => generateSample(g)
+      case Some(x) => x
+    }
+  }
+
+  def allMeasures(deviceId: UUID): Seq[Measure] = {
+    MetricKey.values.toSeq.map { key =>
+      val data = generateSample(metricValueGenerator(key))
+      Measure(deviceId, key, data, System.currentTimeMillis())
     }
   }
 

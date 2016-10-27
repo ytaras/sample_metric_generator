@@ -51,11 +51,12 @@
     <orderEntry type="library" name="SBT: io.kamon:kamon-core_2.11:0.6.0:jar" level="project" />
     <orderEntry type="library" name="SBT: org.hdrhistogram:HdrHistogram:2.1.7:jar" level="project" />
     <orderEntry type="library" name="SBT: io.kamon:kamon-jmx_2.11:0.6.0:jar" level="project" />
-    <orderEntry type="library" name="SBT: io.kamon:kamon-log-reporter_2.11:0.6.0:jar" level="project" />
     <orderEntry type="library" name="SBT: io.kamon:kamon-akka_2.11:0.6.0:jar" level="project" />
     <orderEntry type="library" name="SBT: io.kamon:kamon-scala_2.11:0.6.0:jar" level="project" />
     <orderEntry type="library" name="SBT: io.kamon:kamon-system-metrics_2.11:0.6.0:jar" level="project" />
     <orderEntry type="library" name="SBT: io.kamon:sigar-loader:1.6.5-rev002:jar" level="project" />
     <orderEntry type="library" name="SBT: org.aspectj:aspectjrt:1.8.2:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.slf4j:slf4j-simple:1.7.21:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:kamon-log-reporter_2.11:0.6.0:jar" level="project" />
   </component>
 </module>
