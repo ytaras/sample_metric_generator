@@ -4,14 +4,14 @@ import java.util.UUID
 
 import akka.actor.{ActorLogging, Props, Actor, ActorRef}
 import akka.pattern.BackoffSupervisor
-import generator.DeviceActorSupervisorApi.RegisterDevice
+import generator.AgentActorSupervisorApi.RegisterAgents
 import scala.concurrent.duration._
 
 /**
   * Created by ytaras on 10/27/16.
   */
-class DeviceActor(deviceId: UUID, duration: FiniteDuration, publishTo: ActorRef) extends Actor with ActorLogging {
-  import DeviceActorApi._
+class AgentActor(agentId: UUID, duration: FiniteDuration, publishTo: ActorRef) extends Actor with ActorLogging {
+  import AgentActorApi._
 
   import context.dispatcher
 
@@ -22,20 +22,20 @@ class DeviceActor(deviceId: UUID, duration: FiniteDuration, publishTo: ActorRef)
 
   override def receive: Receive = {
     case Tick =>
-      log.debug("measuring device {}", deviceId)
-      Measure.allMeasures(deviceId).foreach { publishTo ! _ }
+      log.debug("measuring device {}", agentId)
+      Measure.allMeasures(agentId).foreach { publishTo ! _ }
   }
 }
 
-object DeviceActorApi {
+object AgentActorApi {
   case object Tick
   case object Started
 }
 
-class DeviceActorSupervisor(duration: FiniteDuration, publishTo: ActorRef) extends Actor with ActorLogging {
+class AgentActorSupervisor(duration: FiniteDuration, publishTo: ActorRef) extends Actor with ActorLogging {
   def startDevice(uuid: UUID) = {
     log.debug("starting device {}", uuid)
-    val childProps = Props(classOf[DeviceActor], uuid, duration, publishTo)
+    val childProps = Props(classOf[AgentActor], uuid, duration, publishTo)
     context.actorOf(BackoffSupervisor.props(
       childProps,
       s"device_$uuid",
@@ -44,10 +44,10 @@ class DeviceActorSupervisor(duration: FiniteDuration, publishTo: ActorRef) exten
   }
 
   override def receive: Actor.Receive = {
-    case RegisterDevice(uuid) => startDevice(uuid)
+    case RegisterAgents(uuid) => startDevice(uuid)
   }
 }
 
-object DeviceActorSupervisorApi {
-  case class RegisterDevice(uuid: UUID)
+object AgentActorSupervisorApi {
+  case class RegisterAgents(uuid: UUID)
 }

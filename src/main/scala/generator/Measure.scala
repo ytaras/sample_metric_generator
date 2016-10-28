@@ -11,29 +11,29 @@ import scala.annotation.tailrec
   * Created by ytaras on 10/25/16.
   */
 case class Measure(
-                  deviceId: UUID,
-                  metricKey: MetricKey,
-                  metricValue: Double,
-                  timestamp: Long
+                    agentId: UUID,
+                    metricKey: MetricKey,
+                    metricValue: Double,
+                    timestamp: Long
                   ) {
 
   def delayed(amount: Int) = copy(timestamp = timestamp - amount)
 
   def toValidJson =
-    s"""{ "device_id": "$deviceId", "metric_key": "$metricKey", "metric_value": $metricValue, "timestamp": $timestamp }"""
+    s"""{ "agent_id": "$agentId", "metric_key": "$metricKey", "metric_value": $metricValue, "timestamp": $timestamp }"""
 
   def toBrokenJson =
-    s"""{ "device_id": "$deviceId" "metric_key" "$metricKey", "metric_value: $metricValue, "timestamp": $timestamp """
+    s"""{ "agent_id": "$agentId" "metric_key" "$metricKey", "metric_value: $metricValue, "timestamp": $timestamp """
 
   def toJsonWithMissingKey =
-    s"""{ "device_id": "$deviceId", "metric_value": $metricValue, "timestamp": $timestamp }"""
+    s"""{ "agent_id": "$agentId", "metric_value": $metricValue, "timestamp": $timestamp }"""
 
 }
 
 object Measure extends MeasureGenerators {
 
-  def sample(deviceId: UUID): Measure =
-    generateSample(validMeasureGenerator(deviceId))
+  def sample(agentId: UUID): Measure =
+    generateSample(validMeasureGenerator(agentId))
 
   @tailrec
   def generateSample[T](g: Gen[T]): T = {
@@ -43,10 +43,10 @@ object Measure extends MeasureGenerators {
     }
   }
 
-  def allMeasures(deviceId: UUID): Seq[Measure] = {
+  def allMeasures(agentId: UUID): Seq[Measure] = {
     MetricKey.values.toSeq.map { key =>
       val data = generateSample(metricValueGenerator(key))
-      Measure(deviceId, key, data, System.currentTimeMillis())
+      Measure(agentId, key, data, System.currentTimeMillis())
     }
   }
 
@@ -70,11 +70,11 @@ trait MeasureGenerators {
     if res <= max && res >= min
   } yield res
 
-  def validMeasureGenerator(deviceId: UUID): Gen[Measure] = for {
+  def validMeasureGenerator(agentId: UUID): Gen[Measure] = for {
     metric <- keyGenerator
     value <- metricValueGenerator(metric)
   } yield Measure(
-    deviceId, metric, value, System.currentTimeMillis()
+    agentId, metric, value, System.currentTimeMillis()
   )
 
 }

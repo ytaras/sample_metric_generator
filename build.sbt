@@ -17,6 +17,8 @@ libraryDependencies ++= {
     "io.kamon" %% "kamon-akka" % "0.6.0",
     "io.kamon" %% "kamon-scala" % "0.6.0",
     "io.kamon" %% "kamon-system-metrics" % "0.6.0",
+    "io.kamon" %% "kamon-jdbc" % "0.6.0",
+    "org.postgresql" % "postgresql" % "9.4.1211.jre7",
     "org.specs2" %% "specs2-core" % "3.8.5" % "test"
   )
 }

@@ -58,5 +58,7 @@
     <orderEntry type="library" name="SBT: org.aspectj:aspectjrt:1.8.2:jar" level="project" />
     <orderEntry type="library" name="SBT: org.slf4j:slf4j-simple:1.7.21:jar" level="project" />
     <orderEntry type="library" name="SBT: io.kamon:kamon-log-reporter_2.11:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: io.kamon:kamon-jdbc_2.11:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="SBT: org.postgresql:postgresql:9.4.1211.jre7:jar" level="project" />
   </component>
 </module>

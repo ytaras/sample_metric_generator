@@ -18,9 +18,9 @@ import scala.concurrent.duration._
   * Created by ytaras on 10/25/16.
   */
 object Stream  {
-  private def sampleIds(implicit c: Config) = (1 to c.getInt("generator.num-devices")).map(_ => UUID.randomUUID())
+  private def sampleIds(implicit c: Config) = (1 to c.getInt("generator.num-agents")).map(_ => UUID.randomUUID())
 
-  val collectDeviceIds: Flow[UUID, Set[UUID], NotUsed] =
+  val collectAgentIds: Flow[UUID, Set[UUID], NotUsed] =
     Flow[UUID]
       .map(x => Set(x))
       .reduce( _ ++_ )
@@ -32,15 +32,15 @@ object Stream  {
       .map(distruptor)
 
   def tickedMeasuresActor(implicit as: ActorSystem, c: Config) = Source
-      .actorRef[Measure](c.getInt("generator.num-devices") * 100, OverflowStrategy.fail)
+      .actorRef[Measure](c.getInt("generator.num-agents") * 100, OverflowStrategy.fail)
       .mapMaterializedValue(startDevices)
 
   def startDevices(publishTo: ActorRef)(implicit as: ActorSystem, c: Config) = {
-    val deviceSupervisor = as.actorOf(
-      Props(classOf[DeviceActorSupervisor], c.getDuration("generator.frequency").toMillis.millis, publishTo),
-      "device_supervisor"
+    val agentSupervisor = as.actorOf(
+      Props(classOf[AgentActorSupervisor], c.getDuration("generator.frequency").toMillis.millis, publishTo),
+      "agent_supervisor"
     )
-    sampleIds.foreach { x => deviceSupervisor ! DeviceActorSupervisorApi.RegisterDevice(x) }
+    sampleIds.foreach { x => agentSupervisor ! AgentActorSupervisorApi.RegisterAgents(x) }
   }
 
   def main(args: Array[String]): Unit = {
