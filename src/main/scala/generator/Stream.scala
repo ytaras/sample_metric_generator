@@ -18,8 +18,6 @@ import scala.concurrent.duration._
   * Created by ytaras on 10/25/16.
   */
 object Stream  {
-  private def sampleIds(implicit c: Config) = (1 to c.getInt("generator.num-agents")).map(_ => UUID.randomUUID())
-
   val collectAgentIds: Flow[UUID, Set[UUID], NotUsed] =
     Flow[UUID]
       .map(x => Set(x))
@@ -31,22 +29,23 @@ object Stream  {
       .mapConcat(_.map(Measure.sample))
       .map(distruptor)
 
-  def tickedMeasuresActor(implicit as: ActorSystem, c: Config) = Source
+  def tickedMeasuresActor(startIds: Seq[UUID])(implicit as: ActorSystem, c: Config) = Source
       .actorRef[Measure](c.getInt("generator.num-agents") * 100, OverflowStrategy.fail)
-      .mapMaterializedValue(startDevices)
+      .mapMaterializedValue(actor => startDevices(startIds, actor))
 
-  def startDevices(publishTo: ActorRef)(implicit as: ActorSystem, c: Config) = {
+  def startDevices(startIds: Seq[UUID], publishTo: ActorRef)(implicit as: ActorSystem, c: Config) = {
     val agentSupervisor = as.actorOf(
       Props(classOf[AgentActorSupervisor], c.getDuration("generator.frequency").toMillis.millis, publishTo),
       "agent_supervisor"
     )
-    sampleIds.foreach { x => agentSupervisor ! AgentActorSupervisorApi.RegisterAgents(x) }
+    startIds.foreach { x => agentSupervisor ! AgentActorSupervisorApi.RegisterAgents(x) }
   }
 
   def main(args: Array[String]): Unit = {
     Kamon.start()
-    val measuresCounter = Kamon.metrics.counter("measures-counter")
     implicit val config = ConfigFactory.load()
+    AgentsRepository.populateAgents(config.getInt("generator.num-agents"))
+    val measuresCounter = Kamon.metrics.counter("measures-counter")
     val disruptor = MessageDisruptor(config)
     val outputTo = config.getString("generator.topic.measures")
     implicit val as = ActorSystem()
@@ -56,7 +55,7 @@ object Stream  {
       ProducerSettings(system = as,
         keySerializer = new StringSerializer(),
         valueSerializer = new StringSerializer)
-    tickedMeasuresActor
+    tickedMeasuresActor(AgentsRepository.allUuids)
       .map(disruptor)
       .map(elem => new ProducerRecord[String, String](outputTo, elem))
       .alsoTo(

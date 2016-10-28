@@ -1,3 +1,4 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE agent_metadata (
   agent_id uuid NOT NULL DEFAULT uuid_generate_v1() PRIMARY KEY,
   server_name varchar(100) NOT NULL,
